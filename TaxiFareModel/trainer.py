@@ -67,16 +67,13 @@ class Trainer():
     def upload_model(self):
         """ Upload the model to GCP """
         client = storage.Client()
-
         bucket = client.bucket(BUCKET_NAME)
-
         blob = bucket.blob(STORAGE_LOCATION)
-
         blob.upload_from_filename('models/model.joblib')
 
 
 if __name__ == "__main__":
-    N = 10
+    N = 1_000
     df = get_data(nrows=N)
     df = clean_data(df)
     y = df.pop("fare_amount")
