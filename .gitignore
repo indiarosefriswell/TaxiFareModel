@@ -1,3 +1,4 @@
+*joblib
 *.egg-info
 .coverage
 .ipynb_checkpoints

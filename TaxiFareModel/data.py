@@ -10,7 +10,16 @@ def get_data(nrows=10_000):
 
 
 def clean_data(df, test=False):
+    ''' 
+        -+-+ Clean the data +-+-
+        - Drop NaN values
+        - Ignore entries with the dropoff/pickup longitude/latitude = 0, why?
+        - 0 < Fare Amount < 100
+        - 0 <= Passengers < 8
+        - Filter area of pickup/dropoff
+    '''
     df = df.dropna(how='any', axis='rows')
+    # What is the point of these lines whenwe filter more specifically below ?
     df = df[(df.dropoff_latitude != 0) | (df.dropoff_longitude != 0)]
     df = df[(df.pickup_latitude != 0) | (df.pickup_longitude != 0)]
     if "fare_amount" in list(df):
@@ -25,4 +34,5 @@ def clean_data(df, test=False):
 
 
 if __name__ == '__main__':
+    # Return the data frame from the data stored on AWS
     df = get_data()
