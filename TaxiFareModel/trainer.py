@@ -1,5 +1,6 @@
 import joblib
 from termcolor import colored
+from google.cloud import storage
 
 # import from sklearn library
 from sklearn.pipeline import Pipeline
@@ -12,8 +13,12 @@ from sklearn.model_selection import train_test_split
 from TaxiFareModel.encoders import TimeFeaturesEncoder, DistanceTransformer
 from TaxiFareModel.utils import compute_rmse
 from TaxiFareModel.data import get_data, clean_data
+from TaxiFareModel.params import BUCKET_NAME, STORAGE_LOCATION
+
 
 class Trainer():
+    """ This class trains a simple model on Taxi Fares in the US """
+    
     def __init__(self, X, y):
         """
             X: pandas DataFrame
@@ -56,12 +61,22 @@ class Trainer():
 
     def save_model(self):
         """Save the model into a .joblib format"""
-        joblib.dump(self.pipeline, 'model.joblib')
+        joblib.dump(self.pipeline, 'models/model.joblib')
         print(colored("model.joblib saved locally", "green"))
+    
+    def upload_model(self):
+        """ Upload the model to GCP """
+        client = storage.Client()
+
+        bucket = client.bucket(BUCKET_NAME)
+
+        blob = bucket.blob(STORAGE_LOCATION)
+
+        blob.upload_from_filename('models/model.joblib')
 
 
 if __name__ == "__main__":
-    N = 10_000
+    N = 10
     df = get_data(nrows=N)
     df = clean_data(df)
     y = df.pop("fare_amount")
@@ -77,3 +92,4 @@ if __name__ == "__main__":
     print(f"rmse: {rmse}")
     # Save the model locally as a joblib file
     trainer.save_model()
+    trainer.upload_model()
